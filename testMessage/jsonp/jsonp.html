@@ -1,0 +1,40 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    (function (w) {
+        /**
+         * jsonp的实现
+         * @param {string}url
+         * @param {object}data
+         * @param {function}callback
+         */
+          function jsonp(url,data,callback) {
+            let dataString = url.indexOf('?') === -1 ? '?' : '&'
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    const element = data[key];
+                    dataString += `${key}=${data[key]}`
+                }
+            }
+            let callbackName = 'jsonp' + Math.random.toString().substr(2)
+            dataString += `callback=${callbackName}`
+            let scriptEle = document.createElement('script')
+            scriptEle.type = 'text/javascript'
+            scriptEle.src = url + dataString
+            document.body.appendChild(scriptEle)
+            w[callbackName] = function(data){
+                callback(data)
+                document.body.removeChild(scriptEle)
+            }
+          }
+          w.jsonp = jsonp;
+    })(window);
+</script>
+</html>

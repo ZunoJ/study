@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>11111</div>
+    <button onclick="">1111</button>
+</body>
+<script>
+    // function *a(n){
+    //     if(n > 0){
+    //        let c =  yield* a(n - 1)
+    //         yield n - 1
+    //         console.log(c)
+    //     }
+    // }
+    // var v = a(3)
+    // for (const iterator of v) {
+    //     console.log(iterator)
+    // }
+    // let a = [1,2,3]
+    // a[Symbol.iterator] = function(){
+    //     let index = 0
+    //     return {
+    //         next:() => {
+    //             console.log(this)
+    //             if(index < this.length){
+    //                 index++
+    //                 return { done:false,value:1}
+    //             }else{
+    //                 return {done:true}
+    //             }
+    //         }
+    //     }
+    // }
+    // a.forEach(x => {
+    //     console.log(x)
+    // })
+    // for (const iterator of a) {
+    //     console.log(iterator)
+    // }
+    // let a = function(){
+    //     return new Promise((resolve,reject) => {
+    //         setTimeout(() => {
+    //             resolve('1')
+    //         },1000)
+    //     })
+    // }
+    // a().then(res => {
+    //     console.log(res)
+    //     return Promise.resolve(1)
+    // }).then(r => {
+    //     console.log(r)
+    // })
+    let a = {}
+    
+    function definePro(obj,key,val){
+        Object.defineProperty(obj,key,{
+            get(){
+                return val
+            },
+            set(v){
+                console.log(v)
+                val = v
+            }
+        })
+    }
+    definePro(a,'s',a['s'])
+    a.s = 2
+    console.log(a.s)
+</script>
+</html>

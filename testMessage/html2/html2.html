@@ -1,0 +1,46 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div>22222</div>
+    <button onclick="f.a()">2222</button>
+</body>
+<script>
+    function d(fn, time) {
+        let timer = null;
+        return function () {
+            if (!timer) {
+                timer = setTimeout(() => {
+                    console.log(fn);
+                    fn.call(this);
+                    timer = null;
+                }, time);
+            }
+        };
+    }
+    function a() {
+        console.log(this);
+    }
+    let c = d(a, 1000);
+    function t(fn) {
+        let timer = null;
+        return function () {
+            if(timer){
+                clearTimeout(timer)
+            }
+                timer = setTimeout(() => {
+                    fn.call(this);
+                    timer = null;
+                }, 1000)
+        };
+    }
+    let f = {}
+    f.a = t(a, 1000);
+</script>
+
+</html>
