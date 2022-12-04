@@ -4,21 +4,29 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --config webpack.config.js",
-    "compiler": "babel src --out-dir lib --watch"
+    "start": "webpack --mode development",
+    "compiler": "babel src --out-dir lib --watch",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --hot"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.19.6",
+    "babel-loader": "^9.1.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "html-webpack-plugin": "^5.5.0",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
     "@babel/cli": "^7.19.3",
     "@babel/core": "^7.20.2",
     "@babel/generator": "^7.20.4",
     "@babel/parser": "^7.20.3",
+    "@babel/preset-env": "^7.20.2",
     "@babel/traverse": "^7.20.1",
-    "@babel/types": "^7.20.2"
+    "@babel/types": "^7.20.2",
+    "cross-env": "^7.0.3"
   }
 }
