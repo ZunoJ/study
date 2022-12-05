@@ -1,0 +1,51 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document2</title>
+  </head>
+  <body>
+    <button onclick="postMsg()">222</button>
+  </body>
+  <script>
+    // var worker = new Worker('./ww.js');
+    // function postMsg() {
+    //   worker.postMessage('Hello World');
+    // }
+    // worker.onmessage = function (e) {
+    //   console.log(e);
+    // };
+    // let obj = {
+    //   get foo() {
+    //     return 2;
+    //   },
+    // };
+    // let x = 3;
+    // Object.defineProperty(obj, 'a', {
+    //   configurable: true,
+    //   enumerable: true,
+    //   set(val) {
+    //     x = val;
+    //   },
+    //   get() {
+    //     return x;
+    //   },
+    // });
+    // console.log('a' in obj);
+    // console.log(Object.keys(obj));
+    // for (const key in obj) {
+    //   console.log(key);
+    // }
+    // console.log(Object.getOwnPropertyNames(obj));
+    // console.log(Object.entries(obj));
+    function Person() {}
+    function Student() {}
+    var p = new Person();
+    Student.prototype = p; //继承原型
+    var s = new Student();
+    console.log(s.__proto__.__proto__);
+    console.log(s instanceof Student); //true
+    console.log(s instanceof Person); //true
+  </script>
+</html>

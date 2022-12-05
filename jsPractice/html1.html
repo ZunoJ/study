@@ -1,0 +1,29 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document1</title>
+  </head>
+  <body>
+    <input type="text" oninput="b()" id="input" />
+    <button onclick="t()">aaa</button>
+  </body>
+  <script>
+    var l
+    function b(v) {
+      console.log(document.getElementById('input').value)
+      l = v
+    }
+    function t() {
+      worker.postMessage('asfsa')
+    }
+    var worker = new Worker('./ww.js')
+    worker.onmessage = (e) => {
+      console.log(e)
+    }
+    function a() {
+      worker.postMessage('asfsa')
+    }
+  </script>
+</html>

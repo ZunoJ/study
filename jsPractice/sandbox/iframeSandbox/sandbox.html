@@ -1,0 +1,42 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sandbox</title>
+  </head>
+  <body>
+    <div id="fatherDiv" onclick="fatherHello()">1111111</div>
+    <iframe
+      id="myIframe"
+      src="http://localhost:85/sonIframe.html"
+      frameborder="0"
+    ></iframe>
+    <iframe
+      id="sameIframe"
+      src="http://localhost:90/sameHtml.html"
+      frameborder="0"
+    ></iframe>
+  </body>
+  <script>
+    function fatherHello() {
+      console.log('hello son!')
+      document.getElementById('fatherDiv').innerHTML = 'sagasgasgsas'
+      window.frames[1].postMessage('bdsbdsbds', 'http://localhost:90')
+      window.frames[0].postMessage('bdsbdsbds', 'http://localhost:85')
+    }
+    document.getElementById('myIframe').onload = () => {
+      console.log(20)
+    }
+    document.getElementById('sameIframe').contentWindow.onload = () => {
+      console.log(20)
+    }
+    let dynamicIframe = document.createElement('iframe', { url: 'about:blank' })
+    document.body.appendChild(dynamicIframe)
+    console.log(dynamicIframe.contentWindow)
+    // let dynamicIframeWindow = dynamicIframe.contentWindow.parent
+    // setTimeout(() => {
+    //   dynamicIframe.contentWindow.parent.fatherHello()
+    // }, 1000)
+  </script>
+</html>
