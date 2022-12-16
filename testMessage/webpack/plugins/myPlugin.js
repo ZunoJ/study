@@ -1,9 +1,7 @@
 class myPlugin {
   apply(complier) {
-    complier.hooks.done.tap('myPlugin', (complier) => {
-      complier.compilation.hooks.seal.tap('sss', () => {
-        console.log('进入插件洛')
-      })
+    complier.hooks.emit.tap('myPlugin', (compliation) => {
+      console.log('my plugin', compliation)
     })
   }
 }
