@@ -1,0 +1,99 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mini_vue</title>
+  </head>
+  <body>
+    <div id="app">
+      <p>
+        <span>姓名：</span>
+        <span>{{name}}</span>
+      </p>
+      <p>
+        <span>年龄：</span>
+        <span>{{age}}</span>
+      </p>
+    </div>
+    <button type="button" onclick="changeData()">增加年龄</button>
+    <button type="button" onclick="changeName()">改名</button>
+  </body>
+  <script>
+    window.onload = () => {
+      let vue = new Vue({
+        data: {
+          name: '王小明',
+          age: 22,
+        },
+        el: '#app',
+      })
+      this.changeData = () => {
+        vue.$data.age++
+        console.log(vue)
+      }
+      this.changeName = () => {
+        vue.$data.name = vue.$data.name === '王小明' ? '小明' : '王小明'
+      }
+    }
+    class Vue {
+      constructor(option) {
+        this.target = null
+        this.$data = option.data
+        this.$el = option.el
+        this.watch()
+        this.compile(document.querySelector(this.$el))
+      }
+      watch() {
+        for (const key in this.$data) {
+          let watcher = new Watch()
+          let value = this.$data[key]
+          let self = this
+          Object.defineProperty(this.$data, key, {
+            get() {
+              if (self.target) {
+                watcher.watchList.push(self.target)
+              }
+              return value
+            },
+            set(newValue) {
+              value = newValue
+              console.log(newValue)
+              watcher.notify(newValue)
+            },
+          })
+        }
+      }
+      compile(node) {
+        console.dir(node)
+        node.childNodes.forEach((child) => {
+          if (child.nodeType === 3 && /\{\{(.*)\}\}/.test(child.textContent)) {
+            let key = RegExp.$1
+            this.target = child
+            child.textContent = child.textContent.replace(
+              `\{\{${key}\}\}`,
+              this.$data[key.trim()]
+            )
+            this.target = null
+          }
+          if (child.childNodes.length > 0) {
+            this.compile(child)
+          }
+        })
+      }
+    }
+    class Watch {
+      constructor() {
+        this.watchList = []
+      }
+      addWatcher(watcher) {
+        this.watchList.push(watcher)
+      }
+      notify(value) {
+        this.watchList.forEach((watcher) => {
+          watcher.textContent = value
+        })
+      }
+    }
+  </script>
+</html>

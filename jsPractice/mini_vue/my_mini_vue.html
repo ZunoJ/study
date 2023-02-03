@@ -1,0 +1,83 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vue</title>
+  </head>
+  <body>
+    <div id="app">
+      <p>姓名: <span>{{ name}}</span></p>
+      <p>年龄: <span>{{age}}</span></p>
+    </div>
+    <button type="button" onclick="changeData()">年龄增加</button>
+  </body>
+  <script>
+    window.onload = function () {
+      let vue = new Vue({
+        data: {
+          name: '小明',
+          age: 20,
+        },
+      })
+      this.changeData = function () {
+        vue.$data.age++
+      }
+    }
+    class Vue {
+      constructor(options) {
+        this.options = options
+        this.$data = options.data
+        this.observe(this.$data)
+        this.compile(document.querySelector('#app'))
+      }
+      _observe = null
+      observe(data) {
+        Object.keys(data).forEach((key) => {
+          let subject = new Subject()
+          let value = data[key]
+          let self = this
+          Object.defineProperty(data, key, {
+            get() {
+              self._observe && subject.addObserve(self._observe)
+              return value
+            },
+            set(newValue) {
+              value = newValue
+              subject.notify(newValue)
+            },
+          })
+        })
+      }
+      compile(node) {
+        node.childNodes.forEach((child) => {
+          if (child.nodeType === 3 && /\{\{(.*)\}\}/.test(child.textContent)) {
+            let key = RegExp.$1
+            this._observe = child
+            child.textContent = child.textContent.replace(
+              `{{${key}}}`,
+              this.$data[key.trim()]
+            )
+            this._observe = null
+          }
+          if (child.childNodes.length) {
+            this.compile(child)
+          }
+        })
+      }
+    }
+    class Subject {
+      constructor() {
+        this.observeList = []
+      }
+      addObserve(observe) {
+        this.observeList.push(observe)
+      }
+      notify(value) {
+        this.observeList.forEach((observe) => {
+          observe.textContent = value
+        })
+      }
+    }
+  </script>
+</html>

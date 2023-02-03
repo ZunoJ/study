@@ -1,0 +1,183 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta age="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <p>
+        <span>工作:</span>
+        <span>{{job}}</span>
+      </p>
+      <p>
+        <span>年龄:</span>
+        <span>{{info.age}}</span>
+      </p>
+      <input type="text" v-model="info.age" placeholder="请输入名字" />
+      <button type="button" onclick="addAge()">年龄加一</button>
+      <button type="button" onclick="changeName()">换工作</button>
+    </div>
+  </body>
+  <script>
+    window.onload = function () {
+      let vue = new Vue({
+        data: {
+          job: '程序员',
+          info: {
+            age: '11',
+          },
+        },
+        el: '#app',
+      })
+      this.addAge = () => {
+        vue.info.age++
+        console.log(vue)
+      }
+      this.changeName = () => {
+        vue.job = vue.job === '程序员' ? '打工人' : '程序员'
+      }
+    }
+    class Vue {
+      constructor(options) {
+        this.$data = options.data
+        // target用来暂时保存需要观察数据的元素
+        this.target = null
+        this.proxy(options.data, this) // 将data中的数据，全部代理到vue实例中，让实例可以以this.xxx的形式直接访问或者修改变量
+        this.observe(options.data) // 劫持data中的属性
+        this.compile(document.querySelector(options.el)) // 解析dom
+      }
+      proxy($data, vm) {
+        // 将data传入后循环key
+        for (const key in $data) {
+          if (Object.hasOwnProperty.call($data, key)) {
+            const item = $data[key]
+            // 将data中的每一个key在this中定义为存取描述符
+            Object.defineProperty(vm, key, {
+              get() {
+                return $data[key]
+              },
+              set(newValue) {
+                $data[key] = newValue
+              },
+            })
+          }
+        }
+      }
+      observe(data) {
+        // 劫持data中的属性
+        Object.keys(data).forEach((key) => {
+          // 为属性new一个观察者对象
+          let subject = new Subject()
+          // 初始化属性的值，不能直接在get中返回，会重复触发get导致崩溃
+          let value = data[key]
+          // 遇到对象类型，递归劫持
+          if (typeof value === 'object') {
+            this.observe(value)
+          }
+          let self = this
+          Object.defineProperty(data, key, {
+            get() {
+              // 当有观察者元素时，加入对应的观察者列表中
+              if (self.target) {
+                subject.addObserve(self.target)
+              }
+              return value
+            },
+            set(newValue) {
+              value = newValue
+              // 当新赋予的值为对象类型时，递归劫持
+              if (typeof value === 'object') {
+                this.observe(value)
+              }
+              // 当元素改变时，通知所有观察者
+              subject.notifiy(newValue)
+            },
+          })
+        })
+      }
+      compile(dom) {
+        // 遍历节店
+        dom.childNodes.forEach((child) => {
+          // 单纯文本节点
+          if (child.nodeType === 3 && /\{\{(.*)\}\}/.test(child.textContent)) {
+            // 文本节点
+            // 属性值展开来
+            let keys = RegExp.$1.trim().split('.')
+            // 将元素暂时保存在target中，待会触发元素get方法，可以保存到该元素的观察者对象中
+            this.target = child
+            // 遍历获取元素值
+            let value = keys.reduce((total, item) => {
+              // 这里获取了total[item]、this.$data[item]会触发属性的get方法，将元素加入到对应属性的观察者中去
+              total = total ? total[item] : this.$data[item]
+              return total
+            }, null)
+            // 将文本元素的{{xxx}}的值替换成真正的值
+            child.textContent = child.textContent.replace(
+              `\{\{${RegExp.$1.trim()}\}\}`,
+              value
+            )
+            // 将元素清空
+            this.target = null
+          }
+          // 获取可交互的元素，比如input框
+          if (child.nodeType === 1) {
+            this.target = child
+            // 遍历元素的属性
+            for (const attr of child.attributes) {
+              //元素的属性有v-model
+              if (attr.name.includes('v-model')) {
+                let key = attr.value.trim()
+                let keys = attr.value.trim().split('.')
+                // 获取v-model中属性对应的data中的值
+                let value = keys.reduce((total, item) => {
+                  total = total ? total[item] : this.$data[item]
+                  return total
+                }, null)
+                // 给元素加入相对应的属性值，在元素中改变值时，相对应的把data中的值改掉
+                child.addEventListener('input', (e) => {
+                  keys.reduce((total, item) => {
+                    let obj = total[item]
+                    if (typeof obj !== 'object') {
+                      total[item] = e.target.value
+                    }
+                    return obj
+                  }, this.$data)
+                })
+                // 将元素的value设置为data中的值
+                child.value = value
+              }
+            }
+            this.target = null
+          }
+          if (child.childNodes.length) {
+            // 递归遍历dom元素
+            this.compile(child)
+          }
+        })
+      }
+    }
+    // 观察者模式
+    class Subject {
+      constructor() {
+        this.observeList = []
+      }
+      addObserve(observe) {
+        this.observeList.push(observe)
+      }
+      notifiy(value) {
+        this.observeList.forEach((node) => {
+          if (node.nodeType === 3) {
+            // 文本节点
+            node.textContent = value
+          }
+          if (node.nodeType === 1) {
+            // 元素节点
+            node.value = value
+          }
+        })
+      }
+    }
+  </script>
+</html>

@@ -1,0 +1,141 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+  <script>
+    function track(operation) {
+      let runningEffect = getRunningEffect()
+      if (runningEffect) {
+        let { target, key } = operation
+        let proxtMap = connectionStore.get(target)
+        let effectSet = proxtMap.get(key)
+        // 判断此key是否已有effect集合
+        if (!effectSet) {
+          effectSet = new Set()
+          proxtMap.set(key, effectSet)
+        }
+        if (!effectSet.has(runningEffect)) {
+          effectSet.add(runningEffect)
+        }
+      }
+    }
+    function getRunningEffect() {
+      return effectStacks.slice(-1)[0]
+    }
+    function trigger(operation) {
+      let { target, key, type } = operation
+      let proxtMap = connectionStore.get(target)
+      let effectSet = proxtMap.get(key) || new Set()
+      if (type === 'add') {
+        let uniqueKey = Array.isArray(target) ? 'length' : ITERATIONKEY
+        proxtMap.get(uniqueKey).forEach((item) => {
+          effectSet.add(item)
+        })
+        effectSet.forEach((effect) => {
+          effect()
+        })
+      } else {
+        effectSet.forEach((effect) => {
+          effect()
+        })
+      }
+    }
+    const ITERATIONKEY = Symbol('Iteration_key')
+    let baseHandlers = {
+      get(target, key, receiver) {
+        track({ target, key, receiver })
+        let res = Reflect.get(target, key, receiver)
+        // 如果访问的是对象 则返回这个对象的响应式proxy
+        if (isObject(res)) {
+          return reactive(res)
+        }
+        return res
+      },
+      set(target, key, value, receiver) {
+        // 判断key是否新增
+        let hadKey = Object.prototype.hasOwnProperty.call(target, key)
+        let res = Reflect.set(target, key, value, receiver)
+        if (!hadKey) {
+          trigger({ target, key, type: 'add' })
+        } else {
+          trigger({ target, key, type: 'set' })
+        }
+
+        return res
+      },
+      ownKeys(target) {
+        track({ target, key: ITERATIONKEY })
+        return Reflect.ownKeys(target)
+      },
+    }
+
+    let effectStacks = []
+    // 全局map，用来存储所有响应式对象
+    let connectionStore = new WeakMap()
+    let rawToProxy = new WeakMap()
+    function reactive(raw) {
+      // 如果被代理过，直接返回
+      if (connectionStore.has(raw)) {
+        return rawToProxy.get(raw)
+      }
+      let proxyRaw = new Proxy(raw, baseHandlers)
+      // 存储原始值和代理对象的映射
+      rawToProxy.set(raw, proxyRaw)
+      // 在globalMap中加入该响应式对象，值为该对象<key,effect[]:set>
+      connectionStore.set(raw, new Map())
+
+      return proxyRaw
+    }
+
+    // 副作用函数
+    function effect(fn) {
+      let activeEffect = (...args) => {
+        try {
+          effectStacks.push(activeEffect)
+          Reflect.apply(fn, this, args)
+        } finally {
+          effectStacks.pop()
+        }
+      }
+      activeEffect()
+      return activeEffect
+    }
+
+    function isObject(raw) {
+      let flag = raw instanceof Object
+      return flag
+    }
+
+    setTimeout(() => {
+      //   const counter = reactive({ num: 0 })
+
+      //   // 会在控制台打印出0
+      //   const counterReaction = effect(() => {
+      //     console.log(counter.num)
+      //   })
+
+      //   // 会在控制台打印出1
+      //     counter.num = 1
+
+      const counter = reactive({ data: { num: 0 } })
+      const arrayData = reactive([1, 2, 3])
+      // 会在控制台打印出0
+      const counterReaction = effect(() => {
+        console.log(counter.data.num)
+      })
+      effect(() => console.log(Object.keys(counter)))
+      effect(() => {
+        arrayData.forEach(() => {})
+      })
+      console.log(connectionStore)
+      counter.data.num = 5
+      counter.a = 4
+      counter.a = 5
+      //   arrayData.push(137)
+    }, 1000)
+  </script>
+</html>
