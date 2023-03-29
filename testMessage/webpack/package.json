@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --mode development",
+    "build:prod": "cross-env NODE_ENV=production webpack --mode production",
+    "start": "webpack --config webpack.dll.config --mode development",
+    "build": "webpack --mode development",
+    "dllBuild": "npm run start && npm run build",
     "compiler": "babel src --out-dir lib --watch",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --hot"
   },
@@ -27,8 +30,10 @@
     "@babel/preset-env": "^7.20.2",
     "@babel/traverse": "^7.20.1",
     "@babel/types": "^7.20.2",
+    "axios": "^1.3.4",
     "cross-env": "^7.0.3",
     "loader-utils": "^1.2.3",
-    "schema-utils": "^2.6.4"
+    "schema-utils": "^2.6.4",
+    "vue": "^2.6.0"
   }
 }

@@ -1,0 +1,128 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- <div id="app">
+        <div @click="changeArray">You clicked me {{ items }} times.</div>
+        <span>{{$store.state.num}}</span>
+    </div> -->
+    <div id="app1">
+        <span v-for="item in items" :key="item">
+            <xxx></xxx>
+        </span>
+        <div @click="changeArray">2222</div>
+        <keep-alive>
+            <component :is="name"></component>
+        </keep-alive>
+    </div>
+</body>
+<script src="./vue/dist/vue.js"></script>
+<script src="./myVuex.js"></script>
+<script>
+
+    let store = new Vuex.Store({
+        state: {
+            num: 0
+        },
+        getters: {
+            getNum: state => {
+                console.log(26)
+                return state.num + 'a'
+            }
+        }
+    })
+    Vue.use(Vuex)
+
+    let vm2 = new Vue({
+        data: {
+            state: {
+                aaa: 1
+            }
+        }
+    })
+    Vue.component('xxx', {
+        props: ['no'],
+        data () {
+            return {
+                a: 1
+            }
+        },
+        methods: {
+            sss () {
+                this.a = 2
+            }
+        },
+        template: `<div class="ss" @click="sss">
+            <span>{{Math.random()}}</span>
+        </div>`
+    })
+    Vue.component('yyy', {
+        data () {
+            return {
+                a: 1
+            }
+        },
+        methods: {
+            sss () {
+                this.a = 2
+            }
+        },
+        template: `<div class="ss" @click="sss">
+            <span>{{a}}</span>
+        </div>`
+    })
+    Vue.component('zzz', {
+        data () {
+            return {
+                a: 1
+            }
+        },
+        methods: {
+            sss () {
+                this.a = 2
+            }
+        },
+        template: `<div class="ss" @click="sss">
+            <span>{{a}}</span>
+        </div>`
+    })
+    var vm = new Vue({
+        el: '#app1',
+        // template: '<div>掘金</div>',
+        // render (h) {
+        //     return h('h1', {}, '我是沐华')
+        // },
+        store,
+        data: {
+            items: ['a', 'b', 'c'],
+            a: 1,
+            name: 'xxx'
+        },
+        beforeCreate () {
+            // this.$state = vm2.state
+        },
+        watch: {
+            a () {
+                console.log(12)
+            },
+            items () {
+                console.log(9)
+            },
+        },
+        methods: {
+            changeArray () {
+                // this.items[0] = '1'
+                this.items.splice(0, 1)
+                this.name = this.name === 'yyy' ? 'zzz' : 'yyy'
+            }
+        },
+    })
+</script>
+
+</html>

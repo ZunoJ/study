@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    'use strict'
+    function sumArray (sums, total = 0) {
+        if (sums.length === 1) {
+            return sums[0] + total
+        }
+        return sumArray(sums, sums.pop() + total)
+    }
+    sumArray([1, 2, 3, 4, 5])
+</script>
+
+</html>
